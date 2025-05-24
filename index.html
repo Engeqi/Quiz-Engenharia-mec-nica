@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiz Engenharia Mecânica - 3 Níveis</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px; background: #f4f6f8; color: #333; }
+  h1 { text-align: center; color: #0d47a1; }
+  .quiz-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
+  .question { font-size: 1.2em; margin-bottom: 10px; }
+  .answers button { display: block; width: 100%; margin: 8px 0; padding: 10px; font-size: 1em; border-radius: 5px; border: 1px solid #ccc; background: #e3f2fd; cursor: pointer; }
+  .answers button:hover { background: #bbdefb; }
+  .answers button.correct { background: #a5d6a7; border-color: #4caf50; }
+  .answers button.wrong { background: #ef9a9a; border-color: #f44336; }
+  .footer { margin-top: 20px; text-align: center; }
+  button#nextBtn, button#restartBtn { padding: 10px 20px; font-size: 1em; background: #0d47a1; color: white; border: none; border-radius: 5px; cursor: pointer; }
+  button#nextBtn:hover, button#restartBtn:hover { background: #1565c0; }
+  select#levelSelect { font-size: 1em; padding: 5px; margin-bottom: 15px; }
+  #score { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
+  #qiEstimate { margin-top: 10px; font-size: 1.1em; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Quiz Engenharia Mecânica</h1>
+<div class="quiz-container">
+  <label for="levelSelect"><strong>Escolha o nível:</strong></label>
+  <select id="levelSelect">
+    <option value="1">Nível 1 - Básico</option>
+    <option value="2">Nível 2 - Intermediário</option>
+    <option value="3">Nível 3 - Avançado</option>
+  </select>
+
+  <div id="quiz">
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <div class="footer">
+    <button id="nextBtn" disabled>Próxima</button>
+    <button id="restartBtn" style="display:none;">Reiniciar Quiz</button>
+  </div>
+  <div id="score"></div>
+  <div id="qiEstimate"></div>
+</div>
+
+<script>
+const questions = {
+  1: [
+    {q: "Qual a unidade padrão de força no Sistema Internacional?", a: ["Newton", "Joule", "Watt", "Pascal"], correct: 0},
+    {q: "O que é torque?", a: ["Momento de força", "Velocidade angular", "Potência", "Pressão"], correct: 0},
+    {q: "Qual material é mais utilizado em estruturas metálicas?", a: ["Aço", "Alumínio", "Cobre", "Plástico"], correct: 0},
+    {q: "O que é uma engrenagem?", a: ["Roda dentada para transmitir movimento", "Motor elétrico", "Tipo de solda", "Ferramenta de corte"], correct: 0},
+    {q: "Qual o símbolo da força na física?", a: ["F", "V", "P", "T"], correct: 0},
+    {q: "Qual é o nome da unidade de pressão?", a: ["Pascal", "Newton", "Joule", "Metro"], correct: 0},
+    {q: "O que mede um dinamômetro?", a: ["Força", "Temperatura", "Velocidade", "Volume"], correct: 0},
+    {q: "Qual a fórmula da velocidade média?", a: ["distância / tempo", "massa / volume", "força x deslocamento", "tempo x aceleração"], correct: 0},
+    {q: "O que é um parafuso?", a: ["Elemento de fixação", "Ferramenta de medição", "Máquina", "Fluido"], correct: 0},
+    {q: "Qual a função do rolamento?", a: ["Reduzir atrito", "Aumentar força", "Medir pressão", "Transmissão de calor"], correct: 0}
+  ],
+  2: [
+    {q: "Qual o nome do processo que une metais por fusão localizada?", a: ["Soldagem", "Corte", "Dobragem", "Usinagem"], correct: 0},
+    {q: "O que significa o módulo de elasticidade?", a: ["Resistência ao alongamento", "Massa específica", "Dureza", "Condutividade"], correct: 0},
+    {q: "O que é fadiga do material?", a: ["Falha por ciclos repetidos de carga", "Deformação instantânea", "Corrosão", "Oxidação"], correct: 0},
+    {q: "Qual o objetivo do tratamento térmico?", a: ["Modificar propriedades mecânicas", "Medir temperatura", "Lubrificar", "Limpar peças"], correct: 0},
+    {q: "O que é um sistema cinemático?", a: ["Conjunto de elementos que transmitem movimento", "Conjunto de engrenagens", "Sistema elétrico", "Motor a combustão"], correct: 0},
+    {q: "Qual a relação entre torque e potência?", a: ["Potência = Torque x Velocidade angular", "Torque = Potência + Velocidade", "Potência = Força x Tempo", "Torque é sempre constante"], correct: 0},
+    {q: "O que mede um extensômetro?", a: ["Deformação", "Força", "Velocidade", "Temperatura"], correct: 0},
+    {q: "Qual tipo de ligação química predomina em metais?", a: ["Metálica", "Iônica", "Covalente", "Van der Waals"], correct: 0},
+    {q: "Qual a principal característica do aço inoxidável?", a: ["Resistência à corrosão", "Alta densidade", "Condutividade elétrica", "Elasticidade"], correct: 0},
+    {q: "O que é uma estrutura hiperestática?", a: ["Estrutura com mais vínculos que o necessário", "Estrutura simples", "Estrutura sem vínculos", "Estrutura dinâmica"], correct: 0}
+  ],
+  3: [
+    {q: "Qual é a fórmula para calcular o esforço cortante em uma viga simples?", a: ["V = F", "M = F x d", "σ = F/A", "τ = VQ/It"], correct: 3},
+    {q: "O que é fluência em materiais?", a: ["Deformação lenta sob carga constante", "Deformação instantânea", "Ruptura", "Oxidação"], correct: 0},
+    {q: "Qual o critério de falha para materiais dúcteis?", a: ["Critério de von Mises", "Critério de Tresca", "Critério de Mohr", "Critério de Coulomb"], correct: 0},
+    {q: "O que é análise modal?", a: ["Estudo das frequências naturais de vibração", "Análise térmica", "Cálculo de esforços", "Projeto estrutural"], correct: 0},
+    {q: "Qual a finalidade do fator de segurança em projeto?", a: ["Garantir segurança contra falhas", "Maximizar custo", "Reduzir peso", "Diminuir tamanho"], correct: 0},
+    {q: "O que indica o diagrama de tensão-deformação?", a: ["Comportamento mecânico do material", "Temperatura", "Velocidade", "Corrosão"], correct: 0},
+    {q: "Qual é a unidade de momento de inércia?", a: ["m⁴", "m²", "N.m", "Pa"], correct: 0},
+    {q: "O que é um elemento finito?", a: ["Pequena parte da estrutura para análise numérica", "Componente físico", "Tipo de material", "Máquina"], correct: 0},
+    {q: "Em análise de falhas, o que é a tenacidade?", a: ["Resistência à propagação de trincas", "Dureza", "Resistência à compressão", "Elasticidade"], correct: 0},
+    {q: "Qual o efeito da anisotropia em materiais?", a: ["Propriedades dependem da direção", "Propriedades são iguais em todas as direções", "Dureza reduzida", "Alta condutividade"], correct: 0}
+  ]
+};
+
+let currentLevel = 1;
+let currentQuestionIndex = 0;
+let score = 0;
+const totalQuestions = 10;
+
+const levelSelect = document.getElementById("levelSelect");
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const nextBtn = document.getElementById("nextBtn");
+const restartBtn = document.getElementById("restartBtn");
+const scoreEl = document.getElementById("score");
+const qiEl = document.getElementById("qiEstimate");
+
+levelSelect.addEventListener("change", () => {
+  currentLevel = parseInt(levelSelect.value);
+  resetQuiz();
+});
+
+nextBtn.addEventListener("click", () => {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < totalQuestions) {
+    loadQuestion();
+  } else {
+    showScore();
+  }
+});
+
+restartBtn.addEventListener("click", () => {
+  resetQuiz();
+});
+
+function resetQuiz() {
+  score = 0;
+  currentQuestionIndex = 0;
+  scoreEl.textContent = "";
+  qiEl.textContent = "";
+  nextBtn.style.display = "inline-block";
+  restartBtn.style.display = "none";
+  levelSelect.disabled = false;
+  nextBtn.disabled = true;
+  loadQuestion();
+}
+
+function loadQuestion() {
+  nextBtn.disabled = true;
+  const q = questions[currentLevel][currentQuestionIndex];
+  questionEl.textContent = `${currentQuestionIndex + 1}. ${q.q}`;
+  answersEl.innerHTML = "";
+  q.a.forEach((answer, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = answer;
+    btn.onclick = () => selectAnswer(i, btn);
+    answersEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(selectedIndex, btnClicked) {
+  const q = questions[currentLevel][currentQuestionIndex];
+  const buttons = answersEl.querySelectorAll("button");
+
+  buttons.forEach(btn => btn.disabled = true);
+
+  if (selectedIndex === q.correct) {
+    score++;
+    btnClicked.classList.add("correct");
+  } else {
+    btnClicked.classList.add("wrong");
+    buttons[q.correct].classList.add("correct");
+  }
+
+  nextBtn.disabled = false;
+}
+
+function showScore() {
+  questionEl.textContent = "Quiz finalizado!";
+  answersEl.innerHTML = "";
+  nextBtn.style.display = "none";
+  restartBtn.style.display = "inline-block";
+  levelSelect.disabled = false;
+
+  const percent = (score / totalQuestions) * 100;
+  let concept = "";
+  if (percent >= 90) concept = "Excelente";
+  else if (percent >= 70) concept = "Bom";
+  else if (percent >= 50) concept = "Regular";
+  else concept = "Fraco";
+
+  scoreEl.textContent = `Você acertou ${score} de ${totalQuestions} perguntas (${percent.toFixed(0)}%) - Conceito: ${concept}`;
+
+  const qi = estimateQI(percent);
+  qiEl.textContent = `Estimativa de QI: ${qi}`;
+}
+
+function estimateQI(percent) {
+  if (percent >= 90) return "130 a 140+ (Muito acima da média)";
+  else if (percent >= 75) return "115 a 129 (Acima da média)";
+  else if (percent >= 50) return "90 a 114 (Média)";
+  else if (percent >= 30) return "70 a 89 (Abaixo da média)";
+  else return "Abaixo de 70 (Desafiador)";
+}
+
+resetQuiz();
+</script>
+
+</body>
+</html>
